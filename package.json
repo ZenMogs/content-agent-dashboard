@@ -1,0 +1,12 @@
+{
+  "name": "content-agent-dashboard",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "node scripts/fetchData.js",
+    "build": "echo 'Build ready'"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "node-fetch": "^2.6.7"
+  }
+}
