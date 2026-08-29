@@ -1,0 +1,7 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dashboard",
+  "env": {
+    "APIFY_API_KEY": "@apify_api_key"
+  }
+}
