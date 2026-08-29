@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "node scripts/fetchData.js",
-    "build": "mkdir -p public && cp dashboard/index.html public/index.html && (cp dashboard/data.json public/data.json || echo '{\"timestamp\": \"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'\", \"myAccount\": null, \"competitors\": []}' > public/data.json)"
+    "build": "echo 'Build ready'"
   },
   "dependencies": {
     "dotenv": "^16.0.0",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "@vercel/blob": "^0.27.0"
   }
 }
