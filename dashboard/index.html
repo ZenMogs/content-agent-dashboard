@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content Agent Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 20px 0;
+      border-bottom: 2px solid #0f3460;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+      margin-top: 20px;
+    }
+
+    .stat-card {
+      background: rgba(15, 52, 96, 0.6);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      border: 1px solid #0f3460;
+    }
+
+    .stat-card h3 {
+      font-size: 0.9rem;
+      color: #00d4ff;
+      margin-bottom: 5px;
+      opacity: 0.8;
+    }
+
+    .stat-card .value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #7b2ff7;
+    }
+
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .agent-card {
+      background: rgba(15, 52, 96, 0.4);
+      border: 2px solid #0f3460;
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .agent-card:hover {
+      border-color: #00d4ff;
+      background: rgba(15, 52, 96, 0.6);
+      transform: translateY(-5px);
+    }
+
+    .agent-card h2 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: #00d4ff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .agent-icon {
+      font-size: 1.5rem;
+    }
+
+    .agent-status {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #00ff00;
+      margin-left: auto;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .agent-card p {
+      font-size: 0.9rem;
+      color: #b0b0b0;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+
+    .agent-stats {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #7b2ff7;
+    }
+
+    .agent-stats div {
+      margin: 5px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    footer {
+      text-align: center;
+      color: #666;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #0f3460;
+      font-size: 0.85rem;
+    }
+
+    .last-update {
+      color: #00d4ff;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .agents-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-bar {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🚀 Content Agent Dashboard</h1>
+      <p>Your 5-agent content team in action</p>
+    </header>
+
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-card">
+        <h3>Your Posts</h3>
+        <div class="value" id="yourPosts">-</div>
+      </div>
+      <div class="stat-card">
+        <h3>Avg Engagement</h3>
+        <div class="value" id="avgEngagement">-</div>
+      </div>
+      <div class="stat-card">
+        <h3>Competitors</h3>
+        <div class="value" id="competitorCount">-</div>
+      </div>
+      <div class="stat-card">
+        <h3>Data Fresh</h3>
+        <div class="value" id="dataFresh">-</div>
+      </div>
+    </div>
+
+    <div class="agents-grid">
+      <!-- IDEATOR AGENT -->
+      <div class="agent-card">
+        <h2>
+          <span class="agent-icon">💡</span>
+          Ideator
+          <span class="agent-status"></span>
+        </h2>
+        <p>Scouts trending topics in your niche and competitor content</p>
+        <div class="agent-stats">
+          <div>
+            <span>Ideas Generated:</span>
+            <span id="ideatorIdeas">0</span>
+          </div>
+          <div>
+            <span>Top Trend:</span>
+            <span id="ideatorTrend">Analyzing...</span>
+          </div>
+          <div>
+            <span>Last Run:</span>
+            <span id="ideatorRun">--:--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOOK & SCRIPT AGENT -->
+      <div class="agent-card">
+        <h2>
+          <span class="agent-icon">✍️</span>
+          Hook & Script
+          <span class="agent-status"></span>
+        </h2>
+        <p>Crafts viral hooks and full scripts based on trending formats</p>
+        <div class="agent-stats">
+          <div>
+            <span>Scripts Created:</span>
+            <span id="hookScripts">0</span>
+          </div>
+          <div>
+            <span>Avg Hook Length:</span>
+            <span id="hookLength">--</span>
+          </div>
+          <div>
+            <span>Last Run:</span>
+            <span id="hookRun">--:--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLANNER AGENT -->
+      <div class="agent-card">
+        <h2>
+          <span class="agent-icon">📅</span>
+          Planner
+          <span class="agent-status"></span>
+        </h2>
+        <p>Plans your daily content calendar based on engagement patterns</p>
+        <div class="agent-stats">
+          <div>
+            <span>Posts Scheduled:</span>
+            <span id="plannerPosts">0</span>
+          </div>
+          <div>
+            <span>Best Time to Post:</span>
+            <span id="plannerTime">--:--</span>
+          </div>
+          <div>
+            <span>Last Run:</span>
+            <span id="plannerRun">--:--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYST AGENT -->
+      <div class="agent-card">
+        <h2>
+          <span class="agent-icon">📊</span>
+          Analyst
+          <span class="agent-status"></span>
+        </h2>
+        <p>Deep dives into your stats vs competitors and finds gaps</p>
+        <div class="agent-stats">
+          <div>
+            <span>Engagement Rate:</span>
+            <span id="analystEngagement">--%</span>
+          </div>
+          <div>
+            <span>Growth Gap:</span>
+            <span id="analystGap">--%</span>
+          </div>
+          <div>
+            <span>Last Run:</span>
+            <span id="analystRun">--:--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DM MANAGER AGENT -->
+      <div class="agent-card">
+        <h2>
+          <span class="agent-icon">💬</span>
+          DM Manager
+          <span class="agent-status"></span>
+        </h2>
+        <p>Monitors and categorizes incoming DMs for quick response</p>
+        <div class="agent-stats">
+          <div>
+            <span>DMs Monitored:</span>
+            <span id="dmCount">0</span>
+          </div>
+          <div>
+            <span>Response Queue:</span>
+            <span id="dmQueue">Clear</span>
+          </div>
+          <div>
+            <span>Last Run:</span>
+            <span id="dmRun">--:--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>Last Updated: <span class="last-update" id="lastUpdate">--</span></p>
+      <p>Data fetched from Apify • Reporting to Telegram</p>
+    </footer>
+  </div>
+
+  <script>
+    async function loadData() {
+      try {
+        const response = await fetch('./data.json');
+        const data = await response.json();
+        
+        // Update timestamp
+        document.getElementById('lastUpdate').textContent = new Date(data.timestamp).toLocaleString();
+        
+        // Mock agent stats (we'll replace this with real logic later)
+        updateAgentStats(data);
+      } catch (error) {
+        console.error('Error loading data:', error);
+        document.getElementById('lastUpdate').textContent = 'Error loading data';
+      }
+    }
+
+    function updateAgentStats(data) {
+      // Placeholder stats - we'll connect to real data later
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      // Ideator
+      document.getElementById('ideatorIdeas').textContent = Math.floor(Math.random() * 10) + 5;
+      document.getElementById('ideatorTrend').textContent = 'App Dev Trends';
+      document.getElementById('ideatorRun').textContent = timeStr;
+
+      // Hook & Script
+      document.getElementById('hookScripts').textContent = Math.floor(Math.random() * 5) + 2;
+      document.getElementById('hookLength').textContent = Math.floor(Math.random() * 50) + 20 + ' chars';
+      document.getElementById('hookRun').textContent = timeStr;
+
+      // Planner
+      document.getElementById('plannerPosts').textContent = Math.floor(Math.random() * 3) + 1;
+      document.getElementById('plannerTime').textContent = `${Math.floor(Math.random() * 12) + 8}:00 AM`;
+      document.getElementById('plannerRun').textContent = timeStr;
+
+      // Analyst
+      document.getElementById('analystEngagement').textContent = (Math.random() * 10 + 2).toFixed(1);
+      document.getElementById('analystGap').textContent = (Math.random() * 20 + 5).toFixed(1);
+      document.getElementById('analystRun').textContent = timeStr;
+
+      // DM Manager
+      document.getElementById('dmCount').textContent = Math.floor(Math.random() * 20) + 10;
+      document.getElementById('dmQueue').textContent = Math.random() > 0.5 ? 'Clear' : '2 Pending';
+      document.getElementById('dmRun').textContent = timeStr;
+
+      // Stats bar
+      document.getElementById('yourPosts').textContent = Math.floor(Math.random() * 100) + 50;
+      document.getElementById('avgEngagement').textContent = (Math.random() * 10 + 2).toFixed(1) + '%';
+      document.getElementById('competitorCount').textContent = '5';
+      document.getElementById('dataFresh').textContent = 'Live';
+    }
+
+    // Load data when page opens
+    loadData();
+
+    // Refresh every 30 seconds
+    setInterval(loadData, 30000);
+  </script>
+</body>
+  </html>
