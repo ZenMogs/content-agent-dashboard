@@ -1,4 +1,10 @@
 {
   "buildCommand": "mkdir -p public && cp dashboard/index.html public/index.html && cp dashboard/data.json public/data.json 2>/dev/null || true",
-  "outputDirectory": "public"
+  "outputDirectory": "public",
+  "crons": [
+    {
+      "path": "/api/fetch-data",
+      "schedule": "0 9 * * *"
+    }
+  ]
 }
