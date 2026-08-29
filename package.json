@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "node scripts/fetchData.js",
-    "build": "echo 'Build ready'"
+    "build": "mkdir -p public && cp dashboard/index.html public/index.html && cp dashboard/data.json public/data.json 2>/dev/null || true"
   },
   "dependencies": {
     "dotenv": "^16.0.0",
