@@ -8,19 +8,20 @@ const COMPETITORS = process.env.COMPETITORS.split(',');
 async function fetchInstagramData(username) {
   try {
     const response = await fetch(
-      `https://api.apify.com/v2/acts/instagram-scraper~instagram-profile-scraper/run-sync-get-dataset-items?token=${APIFY_API_KEY}`,
+      `https://api.apify.com/v2/acts/apify~instagram-profile-scraper/run-sync-get-dataset-items?token=${APIFY_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          usernames: [username],
-          resultsLimit: 30,
+          usernames: [username]
         })
       }
     );
 
     if (!response.ok) {
-      console.error(`API Error for ${username}:`, response.statusText);
+      console.error(`API Error for ${username}:`, response.status, response.statusText);
+      const errorText = await response.text();
+      console.error('Error body:', errorText);
       return null;
     }
 
@@ -38,26 +39,27 @@ function processInstagramData(rawData) {
   let totalEngagement = 0;
   let postCount = 0;
 
-  if (profile.posts && Array.isArray(profile.posts)) {
-    postCount = profile.posts.length;
-    profile.posts.forEach(post => {
-      totalEngagement += (post.likeCount || 0) + (post.commentsCount || 0);
+  if (profile.latestPosts && Array.isArray(profile.latestPosts)) {
+    postCount = profile.latestPosts.length;
+    profile.latestPosts.forEach(post => {
+      totalEngagement += (post.likesCount || 0) + (post.commentsCount || 0);
     });
   }
 
   const avgEngagement = postCount > 0 ? (totalEngagement / postCount).toFixed(2) : 0;
-  const engagementRate = profile.followers ? ((totalEngagement / (profile.followers * postCount)) * 100).toFixed(2) : 0;
+  const followers = profile.followersCount || 0;
+  const engagementRate = followers && postCount ? ((totalEngagement / (followers * postCount)) * 100).toFixed(2) : 0;
 
   return {
-    username: profile.username || profile.name,
-    followers: profile.followers || 0,
-    following: profile.following || 0,
+    username: profile.username || profile.ownerUsername,
+    followers: followers,
+    following: profile.followsCount || 0,
     biography: profile.biography || '',
-    postsCount: postCount,
+    postsCount: profile.postsCount || postCount,
     avgEngagementPerPost: avgEngagement,
     engagementRate: engagementRate,
     profilePicUrl: profile.profilePicUrl || '',
-    posts: profile.posts ? profile.posts.slice(0, 10) : []
+    posts: profile.latestPosts ? profile.latestPosts.slice(0, 10) : []
   };
 }
 
@@ -88,7 +90,8 @@ module.exports = async function handler(req, res) {
       console.log(`Fetching competitor: ${competitor}`);
       const competitorRawData = await fetchInstagramData(competitor);
       if (competitorRawData) {
-        allData.competitors.push(processInstagramData(competitorRawData));
+        const processed = processInstagramData(competitorRawData);
+        if (processed) allData.competitors.push(processed);
       }
     }
 
@@ -104,7 +107,6 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    // Save to Vercel Blob
     const blob = await put('data.json', JSON.stringify(allData, null, 2), {
       access: 'public',
       allowOverwrite: true,
